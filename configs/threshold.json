@@ -1,0 +1,6 @@
+{
+  "conf": 0.239,
+  "selected_on": "val",
+  "rule": "max mean F1 over classes",
+  "model": "D:\\road_damage_yolo\\runs\\main_yolo26n_640_e30_s42\\weights\\best.pt"
+}

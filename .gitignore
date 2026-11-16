@@ -1,0 +1,18 @@
+# Деректер (RDD2020 — жүктемеу, DOI-ін README-де көрсет)
+data/
+
+# Оқыту нәтижелері мен салмақтар
+runs/
+*.pt
+*.onnx
+
+# Python / Jupyter жүйелік файлдары
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Жеке файлдар
+*.log
+.idea/
