@@ -1,71 +1,71 @@
-# Жол жамылғысындағы ақауларды автоматты анықтау (YOLO26n)
+# Road Damage Detection with YOLO26n
 
-Бұл жоба жол жамылғысындағы ақауларды (жарықтар мен шұңқырлар) суреттен автоматты түрде табуға арналған. Нейрондық желі ретінде YOLO26n моделі қолданылады, ол RDD2020 деректер жиынының жапон бөлігінде оқытылды.
+This project detects road surface damage (cracks and potholes) in images automatically. It uses the YOLO26n model, fine-tuned on the Japan subset of the RDD2020 dataset.
 
-## Нәтижелер
+## Results
 
-Тест жиынында (856 сурет, conf = 0,239):
+Test set (856 images, conf = 0.239):
 
-| Метрика | Мән |
+| Metric | Value |
 |---|---|
-| Precision | 0,608 |
-| Recall | 0,534 |
-| F1 | 0,569 |
-| mAP@0.5 | 0,572 |
-| mAP@0.5:0.95 | 0,278 |
+| Precision | 0.608 |
+| Recall | 0.534 |
+| F1 | 0.569 |
+| mAP@0.5 | 0.572 |
+| mAP@0.5:0.95 | 0.278 |
 
-Ақау класы бойынша mAP@0.5: D00 (бойлық жарық) 0,523, D10 (көлденең жарық) 0,512, D20 (аллигатор жарығы) 0,723, D40 (шұңқыр) 0,529.
+Per-class mAP@0.5: D00 (longitudinal crack) 0.523, D10 (transverse crack) 0.512, D20 (alligator crack) 0.723, D40 (pothole) 0.529.
 
-Жылдамдық (GTX 1650 Ti, FP32, batch = 1): бір суретке медиана 15,6 мс, шамамен 64 кадр/с.
+Speed (GTX 1650 Ti, FP32, batch = 1): median 15.6 ms per image, about 64 frames per second.
 
-## Деректер
+## Dataset
 
-Пайдаланылған деректер: RDD2020, Japan бөлігі.
-Дерек көзі: Mendeley Data, DOI 10.17632/5ty2wb6gvg.1.
+Dataset: RDD2020, Japan subset.
+Source: Mendeley Data, DOI 10.17632/5ty2wb6gvg.1.
 
-Деректер репозиторийге кірмейді. Оны өзің жүктеп, `data/raw/rdd2020/` папкасына орналастыр.
+The dataset is not included in this repository. Download it yourself and place it in `data/raw/rdd2020/`.
 
-Алдын ала өңдеу:
-- XML аннотацияларында тек ресми төрт класс қалдырылды (D00, D10, D20, D40).
-- Суреттер 80/10/10 қатынасында, seed = 42 арқылы бөлінді.
-- Жақын дубликаттар dHash (64-биттік, табалдырық ≤ 5) арқылы алынып тасталды.
+Preprocessing:
+- Only the four official classes were kept (D00, D10, D20, D40) from the XML annotations.
+- Images were split 80/10/10 with seed = 42.
+- Near-duplicate images were removed using dHash (64-bit, threshold ≤ 5).
 
-Соңғы бөлініс: train 6 956, val 864, test 856 сурет.
+Final split: train 6,956, val 864, test 856 images.
 
-## Жоба құрылымы
+## Project structure
 
 ```
-configs/        data.yaml, threshold.json (валидация бойынша таңдалған conf)
-notebooks/      01–08 блокноттары, реттік бойынша орындалады
+configs/        data.yaml, threshold.json (conf selected on validation)
+notebooks/      notebooks 01–08, run in order
 results/
-  figures/      графиктер мен мысалдар
-  predictions/  валидация суреттеріндегі болжамдар
-  tables/       метрикалар, жылдамдық, қате талдауы кестелері
+  figures/      plots and examples
+  predictions/  predictions on validation images
+  tables/       metrics, speed benchmark, error analysis tables
 ```
 
-## Блокноттар
+## Notebooks
 
-1. `01_environment_check.ipynb`: орта мен GPU тексеру
-2. `02_dataset_exploration.ipynb`: деректерді қарап шығу
-3. `03_yolo_conversion.ipynb`: XML-ді YOLO форматына түрлендіру, бөлу, дедупликация
-4. `04_yolo_training.ipynb`: оқыту (30 эпоха, imgsz = 640, batch = 16)
-5. `05_visualization.ipynb`: оқыту қисықтары мен мысалдар
-6. `06_evaluation.ipynb`: валидация мен тест метрикалары, жылдамдық
-7. `07_experiments.ipynb`: қосымша тәжірибелер (міндетті емес)
-8. `08_error_analysis.ipynb`: тест жиынындағы қателер талдауы
+1. `01_environment_check.ipynb`: check the environment and GPU
+2. `02_dataset_exploration.ipynb`: explore the dataset
+3. `03_yolo_conversion.ipynb`: convert XML to YOLO format, split, deduplicate
+4. `04_yolo_training.ipynb`: training (30 epochs, imgsz = 640, batch = 16)
+5. `05_visualization.ipynb`: training curves and examples
+6. `06_evaluation.ipynb`: validation and test metrics, speed
+7. `07_experiments.ipynb`: additional experiments (optional)
+8. `08_error_analysis.ipynb`: error analysis on the test set
 
-## Орнату
+## Installation
 
-Python 3.12 және CUDA қолдайтын PyTorch қажет.
+Requires Python 3.12 and a PyTorch build with CUDA support.
 
 ```bash
 pip install ultralytics==8.4.191
 ```
 
-PyTorch-ты өз видеокартаңа сай CUDA нұсқасымен орнат: https://pytorch.org
+Install PyTorch with the CUDA version that matches your GPU: https://pytorch.org
 
-## Ескертулер
+## Notes
 
-- Модель тек жапон суреттерінде оқытылды. Қазақстан жолдарында тексерілмеді.
-- Тәжірибе бір модель мен бір seed-пен жүргізілді.
-- Conf шегі тек валидация жиыны бойынша таңдалды, тест жиынына тәуелді емес.
+- The model was trained only on Japanese images. It has not been tested on roads in Kazakhstan.
+- The experiment used one model and one random seed.
+- The confidence threshold was selected on the validation set only; the test set was not used for this choice.
